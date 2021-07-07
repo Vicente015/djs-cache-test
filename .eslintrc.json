@@ -1,0 +1,10 @@
+{
+  "extends": ["standard"],
+  "rules": {
+    "eqeqeq": 0,
+    "sort-keys-fix/sort-keys-fix": 1,
+    "sort-destructure-keys/sort-destructure-keys": 1,
+    "sort-requires/sort-requires": 1
+  },
+  "plugins": ["sort-keys-fix", "sort-destructure-keys", "sort-requires"]
+}
