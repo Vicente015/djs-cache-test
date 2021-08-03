@@ -50,9 +50,11 @@
     "threadMembersUpdate",
     "threadMemberUpdate",
     "threadUpdate",
-    "_typingStart",
+    "typingStart",
     "userUpdate",
     "voiceStateUpdate",
-    "webhookUpdate"
+    "webhookUpdate",
+    "guildEmojisUpdate",
+    "guildStickersUpdate"
   ]
 }

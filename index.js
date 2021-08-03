@@ -3,17 +3,20 @@ const chalk = require('chalk')
 const { events } = require('./events.json')
 let Client
 let cacheWithLimits
+let version
 
 function useLibrary(library) {
   if (library === 'djs') {
     Client = require('discord.js').Client
     cacheWithLimits = require('discord.js').Options.cacheWithLimits
+    version = require('discord.js').version
   } else {
     Client = require('discord.js-light').Client
     cacheWithLimits = require('discord.js-light').Options.cacheWithLimits
+    version = require('discord.js-light').version
   }
 }
-useLibrary('djs')
+useLibrary('djs-light')
 
 const ClientOptions = {
   intents: [
@@ -41,7 +44,7 @@ const ClientOptions = {
     GuildChannelManager: 0, // guild.channels
     GuildBanManager: 0, // guild.bans
     GuildInviteManager: 0, // guild.invites
-    GuildManager: Infinity, // client.guilds
+    GuildManager: 0, // client.guilds
     GuildMemberManager: 0, // guild.members
     GuildStickerManager: 0, // guild.stickers
     MessageManager: 0, // channel.messages
@@ -70,7 +73,7 @@ const ClientOptions = {
 const client = new Client(ClientOptions)
 
 client.on('ready', () => {
-  console.log(`${chalk.yellowBright.bold('ready')} ${client.user.tag} (${client.user.id}) is ready in ${client.guilds.cache.size} guilds`)
+  console.log(`${chalk.yellowBright.bold('ready')} ${client.user.tag} (${client.user.id}) is ready in ${client.guilds.cache.size} guilds with ${version}`)
 })
 
 for (let event of events) {
@@ -82,7 +85,7 @@ for (let event of events) {
       chalk.gray(firstValue, JSON.stringify(firstValue, null, 2)),
       chalk.white(`And secondValue: `) +
       chalk.redBright.bold(`partial: ${secondValue?.partial ? 'yes' : 'no'}\n`),
-      chalk.gray(secondValue, JSON.stringify(secondValue, null, 2))
+      chalk.gray(secondValue, JSON.stringify(firstValue, null, 2))
     )
 
     // guildBanAdd / guildBanRemove
