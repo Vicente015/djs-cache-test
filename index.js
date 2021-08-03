@@ -1,14 +1,26 @@
 require('dotenv').config()
 const chalk = require('chalk')
-const { Client, Options: { cacheWithLimits } } = require('discord.js')
 const { events } = require('./events.json')
+let Client
+let cacheWithLimits
 
-const TestClient = new Client({
+function useLibrary(library) {
+  if (library === 'djs') {
+    Client = require('discord.js').Client
+    cacheWithLimits = require('discord.js').Options.cacheWithLimits
+  } else {
+    Client = require('discord.js-light').Client
+    cacheWithLimits = require('discord.js-light').Options.cacheWithLimits
+  }
+}
+useLibrary('djs')
+
+const ClientOptions = {
   intents: [
     'GUILDS',
-    'GUILD_MEMBERS',
     'GUILD_BANS',
-    'GUILD_EMOJIS',
+    'GUILD_MEMBERS',
+    'GUILD_EMOJIS_AND_STICKERS',
     'GUILD_INTEGRATIONS',
     'GUILD_WEBHOOKS',
     'GUILD_INVITES',
@@ -22,32 +34,27 @@ const TestClient = new Client({
     'DIRECT_MESSAGE_TYPING'
   ],
   makeCache: cacheWithLimits({
-    ApplicationCommandManager: 200,
-    ApplicationCommandPermissionsManager: 200,
-    BaseGuildEmojiManager: 200, // cacheEmojis
-    ChannelManager: 200, // cacheChannels
-    ClientVoiceManager: 200,
-    GuildApplicationCommandManager: 200,
-    GuildBanManager: 200, // cacheBans?
-    GuildChannelManager: 200, // cacheChannels
-    GuildEmojiManager: 200, // cacheEmojis
-    GuildEmojiRoleManager: 200, // cacheEmojis
-    GuildInviteManager: 200,
-    GuildManager: 200, // cacheGuilds
-    GuildMemberManager: 200, // cacheMembers
-    GuildMemberRoleManager: 200, // cacheMembers
-    MessageManager: 200, // cacheMessages
-    PermissionOverwriteManager: 200,
-    PresenceManager: 200, // cachePresences
-    ReactionManager: 200, // cacheReactions
-    ReactionUserManager: 200, // cacheReactions
-    RoleManager: 200, // cacheRoles
-    StageInstanceManager: 200,
-    ThreadManager: 200,
-    ThreadMemberManager: 200, // cacheMembers
-    UserManager: 200, // cacheUsers
-    VoiceStateManager: 200,
-    WebSocketManager: 200
+    ApplicationCommandManager: 0, // guild.commands
+    BaseGuildEmojiManager: 0, // guild.emojis
+    GuildEmojiManager: 0,
+    ChannelManager: 0, // client.channels
+    GuildChannelManager: 0, // guild.channels
+    GuildBanManager: 0, // guild.bans
+    GuildInviteManager: 0, // guild.invites
+    GuildManager: Infinity, // client.guilds
+    GuildMemberManager: 0, // guild.members
+    GuildStickerManager: 0, // guild.stickers
+    MessageManager: 0, // channel.messages
+    PermissionOverwriteManager: 0, // channel.permissionOverwrites
+    PresenceManager: 0, // guild.presences
+    ReactionManager: 0, // message.reactions
+    ReactionUserManager: 0, // reaction.users
+    RoleManager: 0, // guild.roles
+    StageInstanceManager: 0, // guild.stageInstances
+    ThreadManager: 0, // channel.threads
+    ThreadMemberManager: 0, // threadchannel.members
+    UserManager: 0, // client.users
+    VoiceStateManager: 0 // guild.voiceStates
   }),
   partials: [
     'USER',
@@ -56,24 +63,31 @@ const TestClient = new Client({
     'MESSAGE',
     'REACTION'
   ]
-})
+}
+/**
+ * @type {import('discord.js-light').Client} client
+ */
+const client = new Client(ClientOptions)
 
-TestClient.on('ready', () => {
-  console.log('Bot ready')
+client.on('ready', () => {
+  console.log(`${chalk.yellowBright.bold('ready')} ${client.user.tag} (${client.user.id}) is ready in ${client.guilds.cache.size} guilds`)
 })
 
 for (let event of events) {
-  TestClient.on(event, (firstValue, secondValue) => {
+  client.on(event, (firstValue, secondValue) => {
     console.log(
-      chalk.blueBright.bold(`[${event}] `) +
-      chalk.white(`Received event with firstValue: `) +
-      chalk.yellow.bold(`partial: ${firstValue?.partial ? 'yes' : 'no'}\n`),
-      chalk.gray(JSON.stringify(firstValue, null, 2)),
+      chalk.yellowBright.bold(`${event} `) +
+      `Received event with firstValue: ` +
+      chalk.redBright.bold(`partial: ${firstValue?.partial ? 'yes' : 'no'}\n`),
+      chalk.gray(firstValue, JSON.stringify(firstValue, null, 2)),
       chalk.white(`And secondValue: `) +
-      chalk.yellow.bold(`partial: ${secondValue?.partial ? 'yes' : 'no'}\n`),
-      chalk.gray(JSON.stringify(secondValue, null, 2))
+      chalk.redBright.bold(`partial: ${secondValue?.partial ? 'yes' : 'no'}\n`),
+      chalk.gray(secondValue, JSON.stringify(secondValue, null, 2))
     )
+
+    // guildBanAdd / guildBanRemove
+    // console.log(firstValue.partial, firstValue.user, firstValue.guild, firstValue.user.partial, firstValue.guild.partial, JSON.stringify(firstValue.user, null, 2), JSON.stringify(firstValue.guild, null, 2))
   })
 }
 
-TestClient.login(process.env.DISCORD_TOKEN)
+client.login()

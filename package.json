@@ -13,7 +13,8 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.1",
-    "discord.js": "^13.0.0-dev.755c180.1625659372",
+    "discord.js": "github:discordjs/discord.js",
+    "discord.js-light": "github:timotejroiko/discord.js-light",
     "dotenv": "^10.0.0"
   },
   "devDependencies": {
@@ -25,7 +26,6 @@
     "eslint-plugin-sort-destructure-keys": "^1.3.5",
     "eslint-plugin-sort-keys-fix": "github:bitboxx/eslint-plugin-sort-keys-fix#patch-1",
     "eslint-plugin-sort-requires": "^2.1.0",
-    "nodemon": "^2.0.7",
-    "prettier-standard": "^15.0.1"
+    "nodemon": "^2.0.7"
   }
 }
